@@ -4,7 +4,13 @@ import {
   InputLabel, MenuItem, FormControl, Select, Box,
 } from '@mui/material';
 
-import PlaceDetails from '../../PlaceDetails/PlaceDetails';
+import PlaceDetails from '../PlaceDetails/PlaceDetails';
+
+const typeLabels = {
+  restaurants: 'Restaurants',
+  hotels: 'Hotels',
+  attractions: 'Attractions',
+};
 
 const List = ({ places, type, setType, rating, setRating, childClicked, isLoading }) => {
   const [elRefs, setElRefs] = useState([]);
@@ -19,7 +25,7 @@ const List = ({ places, type, setType, rating, setRating, childClicked, isLoadin
 
   return (
     <Box sx={{ padding: '25px' }}>
-      <Typography variant="h4" gutterBottom>Food &amp; Dining around you</Typography>
+      <Typography variant="h4" gutterBottom>{typeLabels[type] || 'Places'} around you</Typography>
       {isLoading ? (
         <Box sx={{ height: '600px', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
           <CircularProgress size="5rem" />
@@ -56,6 +62,13 @@ const List = ({ places, type, setType, rating, setRating, childClicked, isLoadin
             </Select>
           </FormControl>
           <Grid container spacing={3} sx={{ height: '75vh', overflow: 'auto' }}>
+            {places?.length === 0 && (
+              <Grid size={12}>
+                <Typography variant="body1" color="text.secondary" sx={{ mt: 2, textAlign: 'center' }}>
+                  No {typeLabels[type]?.toLowerCase()} found in this area. Try moving the map.
+                </Typography>
+              </Grid>
+            )}
             {places?.map((place, i) => (
               <Grid ref={elRefs[i]} key={i} size={12}>
                 <PlaceDetails

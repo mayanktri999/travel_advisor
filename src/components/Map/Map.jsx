@@ -1,8 +1,8 @@
 import React from 'react';
-import { GoogleMap, useJsApiLoader, Marker, InfoWindow } from '@react-google-maps/api';
+import { GoogleMap, Marker, InfoWindow } from '@react-google-maps/api';
 import { Typography, useMediaQuery, Rating, Paper } from '@mui/material';
-import LocationOnOutlinedIcon from '@mui/icons-material/LocationOnOutlined';
 import { styled } from '@mui/material/styles';
+import mapStyles from '../../mapStyles';
 
 const MapWrapper = styled('div')({
   height: '85vh',
@@ -20,21 +20,9 @@ const StyledPaper = styled(Paper)({
 const Map = ({ coords, places, setCoords, setBounds, setChildClicked, weatherData }) => {
   const matches = useMediaQuery('(min-width:600px)');
 
-  const { isLoaded, loadError } = useJsApiLoader({
-    googleMapsApiKey: 'AIzaSyCA0EuoyQ0zUlwtfyF02-UjxqUG43rAgXY',
-  });
-
-  const center = coords && coords.lat !== undefined
+  const center = coords?.lat !== undefined
     ? { lat: coords.lat, lng: coords.lng }
-    : { lat: 0, lng: 0 };
-
-  const onMapLoad = (map) => {
-    // nothing needed on load
-  };
-
-  const onBoundsChanged = () => {
-    // Bounds changes are handled via idle
-  };
+    : { lat: 28.6139, lng: 77.2090 }; // Delhi fallback
 
   const onIdle = (map) => {
     if (!map) return;
@@ -51,24 +39,6 @@ const Map = ({ coords, places, setCoords, setBounds, setChildClicked, weatherDat
     }
   };
 
-  if (loadError) {
-    return (
-      <MapWrapper style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#f0f0f0' }}>
-        <Typography color="error" variant="h6">
-          Map failed to load: {loadError.message}
-        </Typography>
-      </MapWrapper>
-    );
-  }
-
-  if (!isLoaded) {
-    return (
-      <MapWrapper style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#f0f0f0' }}>
-        <Typography variant="h6">Loading map…</Typography>
-      </MapWrapper>
-    );
-  }
-
   return (
     <MapWrapper>
       <GoogleMap
@@ -78,8 +48,12 @@ const Map = ({ coords, places, setCoords, setBounds, setChildClicked, weatherDat
         onLoad={(map) => {
           map.addListener('idle', () => onIdle(map));
         }}
-        options={{ disableDefaultUI: true, zoomControl: true }}
-        onClick={(e) => setChildClicked(null)}
+        options={{
+          disableDefaultUI: true,
+          zoomControl: true,
+          styles: mapStyles,
+        }}
+        onClick={() => setChildClicked(null)}
       >
         {Array.isArray(places) && places.map((place, i) =>
           place.latitude && place.longitude ? (
